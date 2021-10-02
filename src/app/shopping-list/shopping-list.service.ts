@@ -34,6 +34,8 @@ export class ShoppingListService {
 
     this.ingredients = Object.values(
       [...this.ingredients, ...ingredients].reduce((acc, { name, amount }) => {
+        console.log(acc);
+        console.log(name, amount);
         acc[name] = {
           name,
           amount: (acc[name] ? acc[name].amount : 0) + amount,
