@@ -3,12 +3,8 @@ import * as ShoppingListActions from './shopping-list.actions';
 
 export interface State {
   ingredients: Ingredient[];
-  editedIngredient?: Ingredient;
-  editedIngredientIndex?: number;
-}
-
-export interface AppState {
-  shoppingList: State;
+  editedIngredient: Ingredient;
+  editedIngredientIndex: number;
 }
 
 const initialState: State = {
@@ -18,6 +14,22 @@ const initialState: State = {
   editedIngredientIndex: -1,
 };
 
+const mergeIngredients = (
+  oldIng: Ingredient[],
+  newIng: Ingredient[]
+): Ingredient[] =>
+  Object.values(
+    [...oldIng, ...newIng].reduce((acc, { name, amount }) => {
+      const newName =
+        name.charAt(0).toUpperCase() + name.slice(1).toLocaleLowerCase();
+      acc[newName] = {
+        name: newName,
+        amount: (acc[newName] ? acc[newName].amount : 0) + amount,
+      };
+      return acc;
+    }, {})
+  );
+
 export function shoppingListReducer(
   state: State = initialState,
   action: ShoppingListActions.ShoppingListActions
@@ -25,24 +37,21 @@ export function shoppingListReducer(
   switch (action.type) {
     // you never modify the current state, you have to return a new object
     case ShoppingListActions.ADD_INGREDIENT:
-      return { ...state, ingredients: [...state.ingredients, action.payload] };
+      const newIngredients = mergeIngredients(state.ingredients, [
+        action.payload,
+      ]);
+      return {
+        ...state,
+        ingredients: newIngredients,
+      };
     case ShoppingListActions.ADD_INGREDIENTS:
-      const newIngredients = Object.values(
-        [...state.ingredients, ...action.payload].reduce(
-          (acc, { name, amount }) => {
-            acc[name] = {
-              name,
-              amount: (acc[name] ? acc[name].amount : 0) + amount,
-            };
-            return acc;
-          },
-          {}
-        )
+      const newIngredients2 = mergeIngredients(
+        state.ingredients,
+        action.payload
       );
       return {
         ...state,
-        // ingredients: [...state.ingredients, ...action.payload],
-        ingredients: newIngredients,
+        ingredients: newIngredients2,
       };
     case ShoppingListActions.UPDATE_INGREDIENT:
       const ingredient = state.ingredients[state.editedIngredientIndex];
@@ -76,8 +85,8 @@ export function shoppingListReducer(
     case ShoppingListActions.STOP_EDIT:
       return {
         ...state,
-        editedIngredientIndex: null,
-        editedIngredient: -1,
+        editedIngredientIndex: -1,
+        editedIngredient: null,
       };
     default:
       return state;
