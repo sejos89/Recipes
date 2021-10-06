@@ -25,7 +25,9 @@ const routes: Routes = [
   imports: [
     // Adding preloadAllModules we can take advantage of the lazy loading, because we are not loading the modules (but preloading)
     // and we can have the bundles ready to be used, so it will load faster the modules when we need them
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
+    // Adding preloadAllModules we can take advantage of the lazy loading, because we are not loading the modules (but preloading)
+// and we can have the bundles ready to be used, so it will load faster the modules when we need them
+RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules, initialNavigation: 'enabled' }),
   ],
   exports: [RouterModule],
 })
